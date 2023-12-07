@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:snake_game/src/character/player.dart';
 import 'package:snake_game/src/model/game_state.dart';
 import 'package:snake_game/src/ui/background.dart';
+import 'package:snake_game/src/ui/playboard.dart';
+import 'package:snake_game/src/ui/score_view.dart';
 
 class Home extends StatefulWidget {
   Home({super.key});
@@ -20,7 +22,7 @@ class _HomeState extends State<Home> {
 
   void startGame() {
     gameState = gameState.copyWith(status: GameStatus.run);
-    Timer.periodic(const Duration(milliseconds: 10), (timer) {
+    Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (gameState.status == GameStatus.run) {
         gameStreamCotnroller.sink.add(gameState);
       }
@@ -35,10 +37,7 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     gameStreamCotnroller.stream.listen((event) {
-      if (event.status == GameStatus.gameOver) {
-        gameState = event;
-        update();
-      }
+      gameState = event;
     });
   }
 
@@ -69,23 +68,40 @@ class _HomeState extends State<Home> {
         if (value.isKeyPressed(LogicalKeyboardKey.arrowDown)) {
           gameState = gameState.copyWith(keyboradDirection: Direction.down);
         }
-        update();
       },
       child: GestureDetector(
         onTap: startGame,
         child: Scaffold(
-          body: Center(
-            child: SizedBox(
-              width: 600,
-              height: 600,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  const Background(tileSize: (sizeX: 15, sizeY: 15)),
-                  Player(gameController: gameStreamCotnroller),
-                ],
+          backgroundColor: const Color(0xff578a34),
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ScoreView(
+                gameController: gameStreamCotnroller,
               ),
-            ),
+              Center(
+                child: Container(
+                  decoration: BoxDecoration(boxShadow: [
+                    BoxShadow(
+                      color: Color.fromARGB(255, 45, 66, 32).withOpacity(0.7),
+                      blurRadius: 8.0,
+                      spreadRadius: 0.0,
+                      offset: const Offset(0, 7),
+                    )
+                  ]),
+                  width: 600,
+                  height: 600,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      const Background(tileSize: (sizeX: 21, sizeY: 21)),
+                      PlayBoard(
+                          gameController: gameStreamCotnroller, size: 600 / 21),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

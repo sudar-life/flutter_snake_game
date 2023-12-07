@@ -7,7 +7,7 @@ class GameState extends Equatable {
   const GameState({
     this.status = GameStatus.idle,
     this.keyboradDirection = Direction.right,
-    this.counts = 100,
+    this.counts = 1,
   });
 
   @override

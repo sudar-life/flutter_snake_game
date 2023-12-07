@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 class Background extends StatelessWidget {
@@ -7,7 +9,7 @@ class Background extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.green,
+      color: const Color(0xffaad751),
       width: double.infinity,
       height: double.infinity,
       child: CustomPaint(
@@ -23,15 +25,16 @@ class BGTilePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    var paint = Paint()..color = const Color.fromARGB(255, 42, 103, 44);
+    var w = size.width / tileSize.sizeX;
+    var paint = Paint()..color = const Color(0xffa2d149);
     var path = Path();
     path.moveTo(0, 0);
     for (int y = 0; y < tileSize.sizeY; y++) {
       for (int x = 0; x < tileSize.sizeX; x++) {
         var isOdd = y % 2 == 0;
-        var left = 40.0 * x + (isOdd ? 40 : 0);
+        var left = w * x + (isOdd ? w : 0);
         if (x % 2 == 0 && left < size.width) {
-          path.addRect(Rect.fromLTWH(left, 40.0 * y, 40, 40));
+          path.addRect(Rect.fromLTWH(left, w * y, w, w));
         }
       }
     }
