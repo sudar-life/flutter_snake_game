@@ -23,6 +23,7 @@ class _PlayBoardState extends State<PlayBoard> {
   late GameState gameState;
   List<Offset> tails = [];
   late Apple apple;
+  Direction direction = Direction.right;
 
   @override
   void initState() {
@@ -31,7 +32,6 @@ class _PlayBoardState extends State<PlayBoard> {
     _makeApple();
     widget.gameController.stream.listen((event) {
       gameState = event as GameState;
-      print('gameState.counts : ${gameState.counts}');
       if (gameState.status == GameStatus.run) {
         _moveCharactor();
         _checkCollision();
@@ -56,7 +56,6 @@ class _PlayBoardState extends State<PlayBoard> {
     if (apple.position != null) {
       if (DataUtils.isCrash(apple.position!, position)) {
         _makeApple();
-        print("${gameState.counts + 1}as dfalsdkfn");
         widget.gameController.sink
             .add(gameState.copyWith(counts: gameState.counts + 1));
       }
@@ -75,7 +74,8 @@ class _PlayBoardState extends State<PlayBoard> {
 
   void _moveCharactor() {
     var newPosition = tails.first;
-    switch (gameState.keyboradDirection) {
+    direction = gameState.keyboradDirection;
+    switch (direction) {
       case Direction.left:
         newPosition = Offset(newPosition.dx - 0.1, newPosition.dy);
         break;
@@ -106,6 +106,7 @@ class _PlayBoardState extends State<PlayBoard> {
             Player(
               tails: tails,
               size: widget.size,
+              direction: direction,
             ),
             apple,
           ],

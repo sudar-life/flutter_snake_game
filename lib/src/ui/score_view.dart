@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:snake_game/src/components/app_font.dart';
 import 'package:snake_game/src/model/game_state.dart';
 
 class ScoreView extends StatefulWidget {
@@ -29,12 +30,11 @@ class _ScoreViewState extends State<ScoreView> {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
+    return AppFont(
       '${level}Level',
-      style: const TextStyle(
-        fontSize: 20,
-        color: Colors.black,
-      ),
+      size: 20,
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
     );
   }
 }

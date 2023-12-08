@@ -33,6 +33,7 @@ class GameState extends Equatable {
 enum GameStatus {
   idle,
   run,
+  pause,
   gameOver,
 }
 

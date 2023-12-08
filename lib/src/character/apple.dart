@@ -34,13 +34,10 @@ class Apple extends StatelessWidget {
     position = makeResponPosition();
     return Container(
       alignment: Alignment(position!.dx, position!.dy),
-      child: Container(
+      child: Image.asset(
+        'assets/images/apple.png',
         width: size,
         height: size,
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-          color: Color(0xffe7471d),
-        ),
       ),
     );
   }
