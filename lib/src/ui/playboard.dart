@@ -32,9 +32,13 @@ class _PlayBoardState extends State<PlayBoard> {
     _makeApple();
     widget.gameController.stream.listen((event) {
       gameState = event as GameState;
+      if (gameState.status == GameStatus.idle) {
+        tails = [Offset.zero];
+        update();
+      }
       if (gameState.status == GameStatus.run) {
-        _moveCharactor();
         _checkCollision();
+        _moveCharactor();
         update();
       }
     });
@@ -50,6 +54,18 @@ class _PlayBoardState extends State<PlayBoard> {
   void _checkCollision() {
     _gameLineCollision(tails.first);
     _appleCollision(tails.first);
+    if (tails.length > 1) {
+      _bodyCollision(tails.first, tails.sublist(1, tails.length));
+    }
+  }
+
+  void _bodyCollision(Offset position, List<Offset> checkBody) {
+    checkBody.forEach((tail) {
+      if (DataUtils.isCrash(tail, position)) {
+        widget.gameController.sink
+            .add(gameState.copyWith(status: GameStatus.gameOver));
+      }
+    });
   }
 
   void _appleCollision(Offset position) {

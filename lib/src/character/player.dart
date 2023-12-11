@@ -43,10 +43,16 @@ class Player extends StatelessWidget {
                   width: 40,
                   height: 40,
                 ))
-            : Image.asset(
-                'assets/images/body.png',
-                width: 30,
-                height: 30,
+            : SizedBox(
+                width: 40,
+                height: 40,
+                child: Center(
+                  child: Image.asset(
+                    'assets/images/body.png',
+                    width: 30,
+                    height: 30,
+                  ),
+                ),
               ),
       );
     }));

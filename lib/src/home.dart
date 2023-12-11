@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:snake_game/src/character/player.dart';
 import 'package:snake_game/src/model/game_state.dart';
 import 'package:snake_game/src/ui/background.dart';
+import 'package:snake_game/src/ui/game_over_view.dart';
 import 'package:snake_game/src/ui/pause_view.dart';
 import 'package:snake_game/src/ui/playboard.dart';
 import 'package:snake_game/src/ui/score_view.dart';
@@ -20,25 +20,40 @@ class _HomeState extends State<Home> {
   StreamController<GameState> gameStreamCotnroller =
       StreamController<GameState>.broadcast();
   var gameState = const GameState();
+  var showKeysetBoard = true;
 
   @override
   void initState() {
     super.initState();
-    Timer.periodic(const Duration(milliseconds: 100), (timer) {
-      if (gameState.status == GameStatus.run) {
-        gameStreamCotnroller.sink.add(gameState);
-      }
-      if (gameState.status == GameStatus.gameOver) {
-        timer.cancel();
-      }
-    });
+    _gameSet();
     gameStreamCotnroller.stream.listen((event) {
       gameState = event;
     });
   }
 
+  void _gameSet() {
+    Timer.periodic(const Duration(milliseconds: 100), (timer) {
+      if (gameState.status == GameStatus.run) {
+        gameStreamCotnroller.sink.add(gameState);
+      }
+      if (gameState.status == GameStatus.gameOver) {
+        _gameOverView();
+        timer.cancel();
+      }
+    });
+  }
+
+  void reStartGame() {
+    gameState = const GameState(status: GameStatus.idle);
+    gameStreamCotnroller.sink.add(gameState);
+    showKeysetBoard = false;
+    _gameSet();
+  }
+
   void startGame() {
     gameState = gameState.copyWith(status: GameStatus.run);
+    showKeysetBoard = false;
+    update();
   }
 
   void pauseGame() {
@@ -46,7 +61,7 @@ class _HomeState extends State<Home> {
     _showPausePopup();
   }
 
-  void _showPausePopup() async {
+  Future<void> _showPopup(Widget widget) async {
     await Navigator.of(context).push(
       PageRouteBuilder(
         opaque: false,
@@ -55,13 +70,22 @@ class _HomeState extends State<Home> {
           return FadeTransition(
             opacity: animation,
             child: Container(
-              color: Colors.black.withOpacity(0.8),
-              child: const PauseView(),
+              color: Colors.black.withOpacity(0.5),
+              child: widget,
             ),
           );
         },
       ),
     );
+  }
+
+  void _gameOverView() async {
+    await _showPopup(const GameOverView());
+    reStartGame();
+  }
+
+  void _showPausePopup() async {
+    await _showPopup(const PauseView());
     startGame();
   }
 
@@ -102,36 +126,65 @@ class _HomeState extends State<Home> {
       },
       child: Scaffold(
         backgroundColor: const Color(0xff012f37),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        body: Stack(
           children: [
-            Image.asset('assets/images/game_logo.png', width: 140),
-            const SizedBox(height: 30),
-            ScoreView(gameController: gameStreamCotnroller),
-            const SizedBox(height: 10),
-            Center(
-              child: Container(
-                decoration: BoxDecoration(boxShadow: [
-                  BoxShadow(
-                    color:
-                        const Color.fromARGB(255, 45, 66, 32).withOpacity(0.7),
-                    blurRadius: 8.0,
-                    spreadRadius: 0.0,
-                    offset: const Offset(0, 7),
-                  )
-                ]),
-                width: 600,
-                height: 600,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    const Background(tileSize: (sizeX: 21, sizeY: 21)),
-                    PlayBoard(
-                        gameController: gameStreamCotnroller, size: 600 / 21),
-                  ],
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset('assets/images/game_logo.png', width: 140),
+                const SizedBox(height: 30),
+                ScoreView(gameController: gameStreamCotnroller),
+                const SizedBox(height: 10),
+                Center(
+                  child: Container(
+                    decoration: BoxDecoration(boxShadow: [
+                      BoxShadow(
+                        color: const Color.fromARGB(255, 45, 66, 32)
+                            .withOpacity(0.7),
+                        blurRadius: 8.0,
+                        spreadRadius: 0.0,
+                        offset: const Offset(0, 7),
+                      )
+                    ]),
+                    width: 600,
+                    height: 600,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        const Background(tileSize: (sizeX: 21, sizeY: 21)),
+                        PlayBoard(
+                            gameController: gameStreamCotnroller,
+                            size: 600 / 21),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
+            showKeysetBoard
+                ? Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    top: 0,
+                    child: Container(
+                      color: Colors.black.withOpacity(0.5),
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.all(40),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.black.withOpacity(0.5),
+                          ),
+                          child: Image.asset(
+                            'assets/images/keyboard_set.png',
+                            width: 350,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : Container()
           ],
         ),
       ),
