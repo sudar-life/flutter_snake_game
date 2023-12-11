@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:snake_game/src/components/app_font.dart';
 
 class GameOverView extends StatelessWidget {
-  const GameOverView({super.key});
+  final int counts;
+  const GameOverView(this.counts, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +44,8 @@ class GameOverView extends StatelessWidget {
                           'assets/images/apple.png',
                           width: 40,
                         ),
-                        const AppFont(
-                          '19',
+                        AppFont(
+                          counts.toString(),
                           color: Colors.white,
                           size: 25,
                           fontWeight: FontWeight.bold,

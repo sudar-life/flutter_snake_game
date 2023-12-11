@@ -80,7 +80,7 @@ class _HomeState extends State<Home> {
   }
 
   void _gameOverView() async {
-    await _showPopup(const GameOverView());
+    await _showPopup(GameOverView(gameState.counts));
     reStartGame();
   }
 
